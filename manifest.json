@@ -1,6 +1,6 @@
 {
-  "name": "บันทึกรากเทียม - Implant Case Tracker",
-  "short_name": "รากเทียม",
+  "name": "Implant Record - Implant Case Tracker",
+  "short_name": "ImplantCase",
   "description": "บันทึกประวัติคนไข้ ขนาดและวัสดุรากเทียม คลินิก และนัด follow-up/พิมพ์ปาก",
   "start_url": "./index.html",
   "scope": "./",
