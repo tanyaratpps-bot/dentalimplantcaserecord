@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Dental Implant Patient Record</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#FFF8F0">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<script src="config.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap');
+:root{
+  --primary:#F0C040;
+  --primary-text:#1A1A1A;
+  --bg:#FFF8F0;
+  --card:#FFFFFF;
+  --text:#1A1A1A;
+  --muted:#8A8A8A;
+  --danger:#E85D4E;
+  --warn:#F09A2E;
+  --ok:#5BBF7A;
+  --border:#E0D8D0;
+  --bold:#2B2B2B;
+  --header-bg:#FFF8F0;
+  --shadow:none;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  font-family:"Sarabun",-apple-system,"Segoe UI",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  padding-bottom:76px;
+  -webkit-tap-highlight-color:transparent;
+}
+header{
+  background:var(--header-bg);
+  color:var(--text);
+  padding:14px 18px;
+  position:sticky;
+  top:0;
+  z-index:10;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  border-bottom:2.5px solid var(--bold);
+}
+header h1{font-size:17px;margin:0;font-weight:700;letter-spacing:-.2px;}
+header h1 span{color:#E85D4E;}
+header .sub{font-size:11px;color:var(--muted);margin-top:2px;}
+main{padding:14px;max-width:680px;margin:0 auto;}
+.card{
+  background:var(--card);
+  border-radius:20px;
+  padding:16px;
+  margin-bottom:12px;
+  border:2.5px solid var(--bold);
+}
+.card h3{margin:0 0 10px;font-size:15px;font-weight:700;}
+.summary-row{display:flex;gap:8px;margin-bottom:12px;}
+.summary-box{
+  flex:1;
+  background:var(--card);
+  border-radius:18px;
+  padding:14px 8px;
+  text-align:center;
+  border:2.5px solid var(--bold);
+}
+.summary-box .num{font-size:24px;font-weight:700;}
+.summary-box .lbl{font-size:10px;color:var(--muted);margin-top:3px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;}
+.summary-box.overdue{background:#FFF0EE;}
+.summary-box.overdue .num{color:var(--danger);}
+.summary-box.today{background:#FFF8E8;}
+.summary-box.today .num{color:#C07800;}
+.summary-box.week{background:#EEF4FF;}
+.summary-box.week .num{color:#3060C0;}
+.fu-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:11px 0;
+  border-bottom:1.5px solid var(--border);
+  gap:8px;
+}
+.fu-item:last-child{border-bottom:none;}
+.fu-info{flex:1;min-width:0;}
+.fu-info .name{font-weight:700;font-size:14px;}
+.fu-info .meta{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5;}
+.badge{
+  display:inline-block;
+  font-size:11px;
+  padding:3px 9px;
+  border-radius:999px;
+  font-weight:700;
+  white-space:nowrap;
+  border:1.5px solid currentColor;
+}
+.badge.overdue{background:#FFF0EE;color:var(--danger);}
+.badge.today{background:#FFF8E8;color:#C07800;}
+.badge.week{background:#EEF4FF;color:#3060C0;}
+.badge.later{background:#F5F5F5;color:var(--muted);}
+.badge.done{background:#EEFAF3;color:var(--ok);}
+.fu-actions{display:flex;flex-direction:column;gap:4px;align-items:flex-end;}
+.btn{
+  border:2px solid var(--bold);
+  border-radius:999px;
+  padding:9px 18px;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+  background:var(--primary);
+  color:var(--primary-text);
+  font-family:inherit;
+  transition:transform .1s,opacity .15s;
+}
+.btn:active{transform:scale(.96);opacity:.85;}
+.btn.secondary{background:#F5F0E8;color:var(--text);border-color:var(--bold);}
+.btn.small{padding:6px 12px;font-size:12px;}
+.btn.danger{background:#FFF0EE;color:var(--danger);border-color:var(--danger);}
+.btn.ghost{background:transparent;color:var(--text);padding:5px 8px;font-weight:600;border:none;}
+.btn.block{width:100%;margin-top:8px;}
+.fab{
+  position:fixed;
+  bottom:84px;right:18px;
+  width:56px;height:56px;
+  border-radius:50%;
+  background:var(--primary);
+  color:var(--primary-text);
+  font-size:28px;
+  border:2.5px solid var(--bold);
+  z-index:20;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;
+  cursor:pointer;
+  transition:transform .1s;
+}
+.fab:active{transform:scale(.92);}
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--card);
+  border-top:2.5px solid var(--bold);
+  display:flex;
+  z-index:15;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.bottom-nav button{
+  flex:1;
+  background:none;border:none;
+  padding:10px 4px 8px;
+  font-size:11px;
+  color:var(--muted);
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  font-family:inherit;
+  cursor:pointer;
+  position:relative;
+}
+.bottom-nav button.active{color:var(--text);font-weight:700;}
+.bottom-nav button.active::after{
+  content:'';
+  position:absolute;
+  top:0;left:50%;transform:translateX(-50%);
+  width:28px;height:3px;
+  background:var(--primary);
+  border-radius:0 0 4px 4px;
+}
+.bottom-nav .icon{font-size:20px;}
+input,select,textarea{
+  width:100%;
+  padding:11px 12px;
+  border:2px solid var(--border);
+  border-radius:12px;
+  font-size:14px;
+  font-family:inherit;
+  background:#FFFDF9;
+  color:var(--text);
+  transition:border-color .15s;
+}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--bold);background:#fff;}
+label{font-size:13px;font-weight:700;display:block;margin:10px 0 4px;color:var(--text);}
+.row2{display:flex;gap:8px;}
+.row2 > div{flex:1;}
+.search-box{margin-bottom:12px;}
+.patient-item{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:13px 0;border-bottom:1.5px solid var(--border);
+  cursor:pointer;
+}
+.patient-item:last-child{border-bottom:none;}
+.patient-item .name{font-weight:700;font-size:15px;}
+.patient-item .meta{font-size:12px;color:var(--muted);margin-top:3px;}
+.empty{text-align:center;color:var(--muted);padding:32px 10px;font-size:14px;}
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(43,43,43,.45);
+  display:flex;align-items:flex-end;justify-content:center;
+  z-index:50;
+}
+.modal{
+  background:#fff;
+  border-radius:24px 24px 0 0;
+  border-top:2.5px solid var(--bold);
+  border-left:2.5px solid var(--bold);
+  border-right:2.5px solid var(--bold);
+  width:100%;max-width:680px;
+  max-height:90vh;overflow-y:auto;
+  padding:20px 18px;
+  animation:slideup .2s ease-out;
+}
+@keyframes slideup{from{transform:translateY(40px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.modal h2{margin:0 0 14px;font-size:18px;font-weight:700;}
+.modal-close{
+  position:absolute;top:16px;right:16px;
+  background:#F5F0E8;border:2px solid var(--bold);font-size:16px;color:var(--text);
+  width:32px;height:32px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-weight:700;
+}
+.chip-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.chip{
+  border:2px solid var(--bold);
+  background:#F5F0E8;
+  border-radius:999px;
+  padding:6px 14px;
+  font-size:12px;
+  cursor:pointer;
+  font-weight:700;
+  font-family:inherit;
+}
+.chip.active{background:var(--primary);color:var(--primary-text);border-color:var(--bold);}
+.section-title{font-size:11px;font-weight:700;color:var(--muted);margin:18px 0 8px;text-transform:uppercase;letter-spacing:.8px;}
+.case-block{border:2px solid var(--bold);border-radius:16px;padding:12px;margin-bottom:10px;background:#FFFDF9;}
+.case-block h4{margin:0 0 6px;font-size:14px;font-weight:700;}
+.spec{font-size:12px;color:var(--muted);line-height:1.6;}
+hr{border:none;border-top:1.5px solid var(--border);margin:14px 0;}
+.history-text{font-size:13px;color:var(--text);white-space:pre-wrap;line-height:1.7;}
+.toast{
+  position:fixed;bottom:96px;left:50%;transform:translateX(-50%);
+  background:var(--bold);color:#fff;padding:10px 20px;border-radius:999px;
+  font-size:13px;font-weight:700;z-index:60;opacity:0;transition:opacity .2s;
+  white-space:nowrap;border:2px solid #fff;
+}
+.toast.show{opacity:1;}
+.link-btn{background:none;border:none;color:var(--text);font-size:13px;font-weight:700;padding:4px 0;cursor:pointer;font-family:inherit;}
+/* X-ray grid */
+.xray-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;}
+.xray-thumb{
+  aspect-ratio:1;border-radius:12px;overflow:hidden;
+  background:#F5F0E8;position:relative;cursor:pointer;
+  border:2px solid var(--bold);
+}
+.xray-thumb img{width:100%;height:100%;object-fit:cover;}
+.xray-thumb .xray-del{
+  position:absolute;top:4px;right:4px;
+  background:var(--bold);color:#fff;border:none;
+  border-radius:50%;width:22px;height:22px;font-size:12px;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+}
+.xray-thumb .xray-loading{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:22px;
+}
+.xray-upload-btn{
+  aspect-ratio:1;border-radius:12px;
+  border:2.5px dashed var(--bold);
+  background:#FFFDF9;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;gap:4px;color:var(--muted);font-size:11px;font-weight:700;
+}
+.xray-upload-btn .icon{font-size:24px;}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1><span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px;"><svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="10" cy="8" rx="4" ry="7" fill="#fff" stroke="#2B2B2B" stroke-width="2"/><ellipse cx="22" cy="8" rx="4" ry="7" fill="#fff" stroke="#2B2B2B" stroke-width="2"/><ellipse cx="16" cy="21" rx="12" ry="10" fill="#fff" stroke="#2B2B2B" stroke-width="2"/><circle cx="12" cy="19" r="1.6" fill="#2B2B2B"/><circle cx="20" cy="19" r="1.6" fill="#2B2B2B"/><line x1="13" y1="23" x2="19" y2="27" stroke="#E85D4E" stroke-width="2.2" stroke-linecap="round"/><line x1="19" y1="23" x2="13" y2="27" stroke="#E85D4E" stroke-width="2.2" stroke-linecap="round"/></svg></span> Dental Implant Patient Record</h1>
+    <div class="sub" id="headerSub">Implant Case Tracker</div>
+  </div>
+</header>
+<main id="view"></main>
+<button class="fab" id="fabAdd" title="Add new entry" style="font-size:26px;font-weight:900;">＋</button>
+<nav class="bottom-nav">
+  <button data-view="dashboard"><span class="icon"><svg width="26" height="26" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="10" cy="8" rx="4" ry="7" fill="#fff" stroke="#2B2B2B" stroke-width="2"/><ellipse cx="22" cy="8" rx="4" ry="7" fill="#fff" stroke="#2B2B2B" stroke-width="2"/><ellipse cx="16" cy="21" rx="12" ry="10" fill="#fff" stroke="#2B2B2B" stroke-width="2"/><circle cx="12" cy="19" r="1.6" fill="#2B2B2B"/><circle cx="20" cy="19" r="1.6" fill="#2B2B2B"/><line x1="13" y1="23" x2="19" y2="27" stroke="#E85D4E" stroke-width="2.2" stroke-linecap="round"/><line x1="19" y1="23" x2="13" y2="27" stroke="#E85D4E" stroke-width="2.2" stroke-linecap="round"/></svg></span>Follow-up</button>
+  <button data-view="patients"><span class="icon"><svg width="26" height="26" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="10" cy="8" rx="4" ry="7" fill="#D4956A" stroke="#2B2B2B" stroke-width="2"/><ellipse cx="22" cy="8" rx="4" ry="7" fill="#D4956A" stroke="#2B2B2B" stroke-width="2"/><ellipse cx="16" cy="21" rx="12" ry="10" fill="#D4956A" stroke="#2B2B2B" stroke-width="2"/><circle cx="12" cy="19" r="1.6" fill="#2B2B2B"/><circle cx="20" cy="19" r="1.6" fill="#2B2B2B"/><ellipse cx="16" cy="24.5" rx="3.5" ry="2.5" fill="#B87050" stroke="#2B2B2B" stroke-width="1.5"/></svg></span>Patients</button>
+  <button data-view="stats"><span class="icon"><svg width="26" height="26" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="9" r="5.5" fill="#D4956A" stroke="#2B2B2B" stroke-width="2"/><circle cx="24" cy="9" r="5.5" fill="#D4956A" stroke="#2B2B2B" stroke-width="2"/><circle cx="16" cy="20" r="12" fill="#D4956A" stroke="#2B2B2B" stroke-width="2"/><circle cx="11.5" cy="17.5" r="1.6" fill="#2B2B2B"/><circle cx="20.5" cy="17.5" r="1.6" fill="#2B2B2B"/><ellipse cx="16" cy="23" rx="4.5" ry="3" fill="#B87050" stroke="#2B2B2B" stroke-width="1.5"/><circle cx="16" cy="22.5" r="1.1" fill="#2B2B2B"/></svg></span>Statistics</button>
+  <button data-view="settings"><span class="icon"><svg width="26" height="26" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="10" r="5" fill="#F4A0B8" stroke="#2B2B2B" stroke-width="2"/><circle cx="24" cy="10" r="5" fill="#F4A0B8" stroke="#2B2B2B" stroke-width="2"/><circle cx="16" cy="20" r="12" fill="#F4A0B8" stroke="#2B2B2B" stroke-width="2"/><circle cx="11.5" cy="17.5" r="1.6" fill="#2B2B2B"/><circle cx="20.5" cy="17.5" r="1.6" fill="#2B2B2B"/><ellipse cx="16" cy="24" rx="5" ry="3.5" fill="#E080A0" stroke="#2B2B2B" stroke-width="1.5"/><circle cx="13.5" cy="24" r="1.2" fill="#2B2B2B"/><circle cx="18.5" cy="24" r="1.2" fill="#2B2B2B"/></svg></span>Settings</button>
+</nav>
+<div id="modalRoot"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= MIFFY ICON SYSTEM ================= */
+const ICONS = {
+  /* ── Miffy characters ── */
+  miffy:`<svg width="S" height="S" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="10" cy="8" rx="4" ry="7" fill="#fff" stroke="#2B2B2B" stroke-width="2"/><ellipse cx="22" cy="8" rx="4" ry="7" fill="#fff" stroke="#2B2B2B" stroke-width="2"/><ellipse cx="16" cy="21" rx="12" ry="10" fill="#fff" stroke="#2B2B2B" stroke-width="2"/><circle cx="12" cy="19" r="1.6" fill="#2B2B2B"/><circle cx="20" cy="19" r="1.6" fill="#2B2B2B"/><line x1="13" y1="23" x2="19" y2="27" stroke="#E85D4E" stroke-width="2.2" stroke-linecap="round"/><line x1="19" y1="23" x2="13" y2="27" stroke="#E85D4E" stroke-width="2.2" stroke-linecap="round"/></svg>`,
+  boris:`<svg width="S" height="S" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="10" cy="8" rx="4" ry="7" fill="#D4956A" stroke="#2B2B2B" stroke-width="2"/><ellipse cx="22" cy="8" rx="4" ry="7" fill="#D4956A" stroke="#2B2B2B" stroke-width="2"/><ellipse cx="16" cy="21" rx="12" ry="10" fill="#D4956A" stroke="#2B2B2B" stroke-width="2"/><circle cx="12" cy="19" r="1.6" fill="#2B2B2B"/><circle cx="20" cy="19" r="1.6" fill="#2B2B2B"/><ellipse cx="16" cy="24.5" rx="3.5" ry="2.5" fill="#B87050" stroke="#2B2B2B" stroke-width="1.5"/></svg>`,
+  bear:`<svg width="S" height="S" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="9" r="5.5" fill="#D4956A" stroke="#2B2B2B" stroke-width="2"/><circle cx="24" cy="9" r="5.5" fill="#D4956A" stroke="#2B2B2B" stroke-width="2"/><circle cx="16" cy="20" r="12" fill="#D4956A" stroke="#2B2B2B" stroke-width="2"/><circle cx="11.5" cy="17.5" r="1.6" fill="#2B2B2B"/><circle cx="20.5" cy="17.5" r="1.6" fill="#2B2B2B"/><ellipse cx="16" cy="23" rx="4.5" ry="3" fill="#B87050" stroke="#2B2B2B" stroke-width="1.5"/><circle cx="16" cy="22.5" r="1.1" fill="#2B2B2B"/></svg>`,
+  pig:`<svg width="S" height="S" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="10" r="5" fill="#F4A0B8" stroke="#2B2B2B" stroke-width="2"/><circle cx="24" cy="10" r="5" fill="#F4A0B8" stroke="#2B2B2B" stroke-width="2"/><circle cx="16" cy="20" r="12" fill="#F4A0B8" stroke="#2B2B2B" stroke-width="2"/><circle cx="11.5" cy="17.5" r="1.6" fill="#2B2B2B"/><circle cx="20.5" cy="17.5" r="1.6" fill="#2B2B2B"/><ellipse cx="16" cy="24" rx="5" ry="3.5" fill="#E080A0" stroke="#2B2B2B" stroke-width="1.5"/><circle cx="13.5" cy="24" r="1.2" fill="#2B2B2B"/><circle cx="18.5" cy="24" r="1.2" fill="#2B2B2B"/></svg>`,
+  /* ── Functional icons (bold Miffy style) ── */
+  tooth:`<svg width="S" height="S" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.5 3C6 3 4 5.2 4 7.8C4 9.5 4.9 10.8 5 12.5C5.5 16 6.2 21 8.5 21C10 21 10.5 18.5 12 18.5C13.5 18.5 14 21 15.5 21C17.8 21 18.5 16 19 12.5C19.1 10.8 20 9.5 20 7.8C20 5.2 18 3 15.5 3C14 3 13 4 12 4C11 4 10 3 8.5 3Z" fill="white" stroke="#2B2B2B" stroke-width="2" stroke-linejoin="round"/></svg>`,
+  calendar:`<svg width="S" height="S" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="5" width="18" height="16" rx="3" fill="#EEF4FF" stroke="#2B2B2B" stroke-width="2"/><line x1="3" y1="10" x2="21" y2="10" stroke="#2B2B2B" stroke-width="2"/><line x1="8" y1="3" x2="8" y2="7" stroke="#2B2B2B" stroke-width="2.5" stroke-linecap="round"/><line x1="16" y1="3" x2="16" y2="7" stroke="#2B2B2B" stroke-width="2.5" stroke-linecap="round"/><circle cx="8" cy="15" r="1.5" fill="#E85D4E"/><circle cx="12" cy="15" r="1.5" fill="#F0C040"/><circle cx="16" cy="15" r="1.5" fill="#5BBF7A"/></svg>`,
+  check:`<svg width="S" height="S" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" fill="#EEFAF3" stroke="#2B2B2B" stroke-width="2"/><path d="M7 12L10.5 16L17 8" stroke="#5BBF7A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  xray:`<svg width="S" height="S" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="2" width="14" height="20" rx="2" fill="#2B2B2B" stroke="#2B2B2B" stroke-width="1.5"/><rect x="8" y="5" width="8" height="10" rx="1" fill="#6B9FD4"/><line x1="8" y1="18" x2="16" y2="18" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+  chart:`<svg width="S" height="S" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="13" width="5" height="8" rx="1" fill="#F0C040" stroke="#2B2B2B" stroke-width="1.5"/><rect x="9.5" y="8" width="5" height="13" rx="1" fill="#E85D4E" stroke="#2B2B2B" stroke-width="1.5"/><rect x="16" y="4" width="5" height="17" rx="1" fill="#5BBF7A" stroke="#2B2B2B" stroke-width="1.5"/><line x1="2" y1="21" x2="22" y2="21" stroke="#2B2B2B" stroke-width="2" stroke-linecap="round"/></svg>`,
+  bone:`<svg width="S" height="S" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="6" r="3.5" fill="white" stroke="#2B2B2B" stroke-width="1.5"/><circle cx="18.5" cy="6" r="3.5" fill="white" stroke="#2B2B2B" stroke-width="1.5"/><circle cx="5.5" cy="18" r="3.5" fill="white" stroke="#2B2B2B" stroke-width="1.5"/><circle cx="18.5" cy="18" r="3.5" fill="white" stroke="#2B2B2B" stroke-width="1.5"/><rect x="8" y="4" width="8" height="16" rx="4" fill="white" stroke="#2B2B2B" stroke-width="1.5"/></svg>`,
+  membrane:`<svg width="S" height="S" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 10C5.5 7 7.5 13 10 10C12.5 7 14.5 13 17 10C19.5 7 21.5 11 22 10" stroke="#2B2B2B" stroke-width="2.5" stroke-linecap="round"/><path d="M3 16C5.5 13 7.5 19 10 16C12.5 13 14.5 19 17 16C19.5 13 21.5 17 22 16" stroke="#D4956A" stroke-width="2" stroke-linecap="round"/></svg>`,
+  crown:`<svg width="S" height="S" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 19L3 9L7.5 14L12 4L16.5 14L21 9L21 19Z" fill="#F0C040" stroke="#2B2B2B" stroke-width="2" stroke-linejoin="round"/><rect x="3" y="19" width="18" height="3" rx="1" fill="#F0C040" stroke="#2B2B2B" stroke-width="1.5"/></svg>`,
+  screw:`<svg width="S" height="S" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="7" r="5" fill="white" stroke="#2B2B2B" stroke-width="2"/><line x1="9" y1="7" x2="15" y2="7" stroke="#2B2B2B" stroke-width="1.5" stroke-linecap="round"/><path d="M10 12H14V21H10V12Z" fill="white" stroke="#2B2B2B" stroke-width="2" stroke-linejoin="round"/><line x1="10" y1="15" x2="14" y2="15" stroke="#2B2B2B" stroke-width="1.5"/><line x1="10" y1="18" x2="14" y2="18" stroke="#2B2B2B" stroke-width="1.5"/></svg>`,
+  lab:`<svg width="S" height="S" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 3H15V10L20 20H4L9 10V3Z" fill="#F0F8FF" stroke="#2B2B2B" stroke-width="2" stroke-linejoin="round"/><line x1="8" y1="10" x2="16" y2="10" stroke="#2B2B2B" stroke-width="1.5"/><circle cx="10" cy="15.5" r="1.5" fill="#6B9FD4"/><circle cx="14" cy="17.5" r="1" fill="#E85D4E"/></svg>`,
+  hospital:`<svg width="S" height="S" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="8" width="18" height="13" rx="2" fill="#EEF4FF" stroke="#2B2B2B" stroke-width="2"/><path d="M8 3H16V8H8V3Z" fill="#F0C040" stroke="#2B2B2B" stroke-width="1.5"/><line x1="12" y1="12" x2="12" y2="17" stroke="#E85D4E" stroke-width="2.5" stroke-linecap="round"/><line x1="9.5" y1="14.5" x2="14.5" y2="14.5" stroke="#E85D4E" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+  upload:`<svg width="S" height="S" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3L17.5 9.5H14V17H10V9.5H6.5L12 3Z" fill="#F0C040" stroke="#2B2B2B" stroke-width="1.5" stroke-linejoin="round"/><line x1="4" y1="21" x2="20" y2="21" stroke="#2B2B2B" stroke-width="2" stroke-linecap="round"/></svg>`,
+  summary:`<svg width="S" height="S" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="18" height="18" rx="3" fill="white" stroke="#2B2B2B" stroke-width="2"/><line x1="7" y1="8" x2="17" y2="8" stroke="#2B2B2B" stroke-width="1.5" stroke-linecap="round"/><line x1="7" y1="12" x2="14" y2="12" stroke="#2B2B2B" stroke-width="1.5" stroke-linecap="round"/><line x1="7" y1="16" x2="11" y2="16" stroke="#2B2B2B" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+  warning:`<svg width="S" height="S" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3L22 21H2L12 3Z" fill="#FFF0E8" stroke="#2B2B2B" stroke-width="2" stroke-linejoin="round"/><line x1="12" y1="10" x2="12" y2="15" stroke="#F09A2E" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="18" r="1.3" fill="#F09A2E"/></svg>`,
+  cloud:`<svg width="S" height="S" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 19C3.8 19 2 17.3 2 15.2C2 13.2 3.5 11.5 5.5 11.1C6.1 8.3 8.6 6.2 11.6 6.2C13.9 6.2 15.9 7.4 17 9.2C19.7 9.6 22 11.8 22 14.6C22 17.1 19.8 19 17 19H6Z" fill="#E8F0FF" stroke="#2B2B2B" stroke-width="2" stroke-linejoin="round"/></svg>`,
+  tag:`<svg width="S" height="S" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 3H12L21 12L12 21L3 12V3Z" fill="#FFF8E8" stroke="#2B2B2B" stroke-width="2" stroke-linejoin="round"/><circle cx="8" cy="8" r="2" fill="#F0C040" stroke="#2B2B2B" stroke-width="1.5"/></svg>`,
+  closure:`<svg width="S" height="S" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="10" r="7" fill="white" stroke="#2B2B2B" stroke-width="2"/><circle cx="12" cy="10" r="3" fill="#F0C040" stroke="#2B2B2B" stroke-width="1.5"/><path d="M9 17V21M15 17V21" stroke="#2B2B2B" stroke-width="2" stroke-linecap="round"/></svg>`,
+};
+function ico(name, sz=18){
+  const s = ICONS[name];
+  if(!s) return '';
+  return s.replace(/\bS\b/g, sz);
+}
+
+/* ================= DATA LAYER ================= */
+const STORAGE_KEY = 'implantTrackerData_v1';
+const FU_TYPES = [
+  'Extraction / Socket check',
+  'Pre-implant assessment',
+  'Suture removal / Wound check',
+  'Stage 2 uncovery',
+  'Impression',
+  'Try-in',
+  'Final restoration',
+  'Recall / Follow-up',
+  'Other'
+];
+const BRAND_SUGGEST = ['Straumann','Nobel Biocare','Osstem','Dentium','MegaGen AnyRidge','Astra Tech','Zimmer Biomet','BioHorizons','Neodent','Implant Direct'];
+const BONE_GRAFT_SUGGEST = ['Bio-Oss','Bio-Oss Collagen','Allograft','Autograft','Cerasorb','OCS-B','Not used'];
+const MEMBRANE_SUGGEST = ['Bio-Gide','OsseoGuard','Collagen membrane','d-PTFE','Titanium mesh','Not used'];
+const ABUTMENT_TYPE_SUGGEST = ['Stock Abutment','Custom Abutment (CAD/CAM)','Ti-base','Screw-retained','Cement-retained','Multi-unit Abutment','Healing Abutment'];
+const CROWN_MATERIAL_SUGGEST = ['Zirconia','PFM (Porcelain Fused to Metal)','E-max (Lithium Disilicate)','Full Ceramic','Acrylic (Temporary)','Composite'];
+
+function loadData(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const data = JSON.parse(raw);
+      migrateCases(data);
+      return data;
+    }
+  }catch(e){}
+  return {patients:[], cases:[], followups:[], clinics:[], brands:[], labNames:[]};
+}
+function migrateDB(data){
+  if(!data.brands) data.brands=[];
+  if(!data.labNames) data.labNames=[];
+  if(!data.clinics) data.clinics=[];
+}
+function migrateCases(data){
+  migrateDB(data);
+  (data.cases||[]).forEach(c=>{
+    if(!c.implants){
+      c.implants = [{
+        tooth: c.tooth||'',
+        brand: c.brand||'',
+        diameter: c.diameter||'',
+        length: c.length||'',
+        material: c.material||'',
+        abutmentMaterial: c.abutmentMaterial||'',
+        boneGraft: '',
+        membrane: ''
+      }];
+      delete c.tooth; delete c.brand; delete c.diameter; delete c.length; delete c.material; delete c.abutmentMaterial;
+    }
+    (c.implants||[]).forEach(im=>{
+      if(!im.surgeryDate) im.surgeryDate = c.surgeryDate || '';
+      if(!im.xrays) im.xrays = [];
+    });
+  });
+  (data.patients||[]).forEach(p=>{
+    if(p.clinic===undefined) p.clinic='';
+    if(!p.xrays) p.xrays=[];
+  });
+}
+function saveData(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(DB));
+}
+let DB = loadData();
+
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
+
+/* ================= HELPERS ================= */
+function todayStr(){
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function fmtDate(iso){
+  if(!iso) return '-';
+  const [y,m,d] = iso.split('-');
+  const be = parseInt(y,10)+543;
+  return `${d}/${m}/${y} (BE ${be})`;
+}
+function fmtDateShort(iso){
+  if(!iso) return '-';
+  const [y,m,d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+function daysDiff(iso){
+  const today = new Date(todayStr());
+  const due = new Date(iso);
+  return Math.round((due-today)/86400000);
+}
+function getPatient(id){ return DB.patients.find(p=>p.id===id); }
+function getCase(id){ return DB.cases.find(c=>c.id===id); }
+function casesForPatient(pid){ return DB.cases.filter(c=>c.patientId===pid); }
+function followupsForCase(cid){ return DB.followups.filter(f=>f.caseId===cid).sort((a,b)=>a.dueDate.localeCompare(b.dueDate)); }
+function caseSurgeryDate(c){
+  const dates = (c.implants||[]).map(im=>im.surgeryDate).filter(Boolean).sort();
+  if(dates.length) return dates[dates.length-1];
+  // Fall back to extractionDate or plannedImplantDate for pre-stage cases
+  const extDates = (c.implants||[]).map(im=>im.extractionDate||im.plannedImplantDate||'').filter(Boolean).sort();
+  return extDates.length ? extDates[extDates.length-1] : (c.surgeryDate || '');
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1800);
+}
+function closeModal(){
+  document.getElementById('modalRoot').innerHTML = '';
+}
+function openModal(html){
+  document.getElementById('modalRoot').innerHTML = `<div class="modal-overlay" onclick="if(event.target===this)closeModal()"><div class="modal">${html}</div></div>`;
+}
+
+/* ================= ROUTER ================= */
+let currentView = 'dashboard';
+let currentPatientId = null;
+
+function setView(view, patientId){
+  currentView = view;
+  currentPatientId = patientId || null;
+  document.querySelectorAll('.bottom-nav button').forEach(b=>{
+    b.classList.toggle('active', b.dataset.view===view);
+  });
+  render();
+}
+
+document.querySelectorAll('.bottom-nav button').forEach(b=>{
+  b.addEventListener('click', ()=>setView(b.dataset.view));
+});
+document.getElementById('fabAdd').addEventListener('click', ()=>openCaseForm());
+
+function render(){
+  const view = document.getElementById('view');
+  if(currentView==='dashboard') view.innerHTML = renderDashboard();
+  else if(currentView==='patients') view.innerHTML = renderPatients();
+  else if(currentView==='patientDetail') view.innerHTML = renderPatientDetail(currentPatientId);
+  else if(currentView==='stats') view.innerHTML = renderStats();
+  else if(currentView==='settings') view.innerHTML = renderSettings();
+  document.getElementById('headerSub').textContent =
+    {dashboard:'Appointments / Follow-up', patients:'Patient List', patientDetail:'Patient Profile', stats:'Statistics', settings:'Settings / Backup'}[currentView] || '';
+}
+
+/* ================= DASHBOARD ================= */
+function renderDashboard(){
+  const pending = DB.followups.filter(f=>f.status!=='done');
+  pending.sort((a,b)=>a.dueDate.localeCompare(b.dueDate));
+
+  const overdue = pending.filter(f=>daysDiff(f.dueDate)<0).length;
+  const today = pending.filter(f=>daysDiff(f.dueDate)===0).length;
+  const week = pending.filter(f=>{const d=daysDiff(f.dueDate); return d>0 && d<=7;}).length;
+
+  let html = `
+  <div class="summary-row">
+    <div class="summary-box overdue"><div class="num">${overdue}</div><div class="lbl">Overdue</div></div>
+    <div class="summary-box today"><div class="num">${today}</div><div class="lbl">Today</div></div>
+    <div class="summary-box week"><div class="num">${week}</div><div class="lbl">Within 7 days</div></div>
+  </div>
+  <div class="card">
+    <h3>${ico('calendar',18)} Pending Appointments / Follow-up</h3>`;
+
+  if(pending.length===0){
+    html += `<div class="empty">No pending appointments<br>Tap ＋ to add a new implant case</div>`;
+  }else{
+    pending.forEach(f=>{
+      const c = getCase(f.caseId);
+      const p = c ? getPatient(c.patientId) : null;
+      const d = daysDiff(f.dueDate);
+      let badgeClass='later', badgeText=`in ${d} days`;
+      if(d<0){badgeClass='overdue'; badgeText=`${-d} days overdue`;}
+      else if(d===0){badgeClass='today'; badgeText='Today';}
+      else if(d<=7){badgeClass='week'; badgeText=`in ${d} days`;}
+      const typeLabel = escapeHtml(f.type==='Other' && f.customType ? f.customType : f.type);
+      const teethLabel = c ? (c.implants||[]).map(im=>im.tooth).filter(Boolean).join(', ') : '';
+      html += `
+      <div class="fu-item">
+        <div class="fu-info" onclick="goToPatient('${p?p.id:''}')">
+          <div class="name">${p?escapeHtml(p.name):'(Patient not found)'} ${c?`<span style="color:var(--muted);font-weight:400;">· ${escapeHtml(c.clinic||'')}</span>`:''}</div>
+          <div class="meta">${typeLabel} · ${teethLabel?('Tooth '+escapeHtml(teethLabel)):''}</div>
+          <div class="meta">📅 ${fmtDateShort(f.dueDate)} <span class="badge ${badgeClass}" style="margin-left:6px;">${badgeText}</span></div>
+        </div>
+        <div class="fu-actions">
+          <button class="btn small" onclick="markDone('${f.id}')">Done</button>
+          <button class="btn small secondary" onclick="rescheduleFU('${f.id}')">Reschedule</button>
+        </div>
+      </div>`;
+    });
+  }
+  html += `</div>`;
+
+  const done = DB.followups.filter(f=>f.status==='done').sort((a,b)=>b.doneDate.localeCompare(a.doneDate)).slice(0,5);
+  if(done.length){
+    html += `<div class="card"><h3>${ico('check',18)} Recently Completed</h3>`;
+    done.forEach(f=>{
+      const c = getCase(f.caseId);
+      const p = c ? getPatient(c.patientId) : null;
+      const typeLabel = escapeHtml(f.type==='Other' && f.customType ? f.customType : f.type);
+      html += `<div class="fu-item">
+        <div class="fu-info">
+          <div class="name">${p?escapeHtml(p.name):'-'}</div>
+          <div class="meta">${typeLabel} · Completed on ${fmtDateShort(f.doneDate)}</div>
+        </div>
+        <span class="badge done">Done</span>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+  return html;
+}
+
+function goToPatient(pid){
+  if(!pid) return;
+  setView('patientDetail', pid);
+}
+function markDone(fid){
+  const f = DB.followups.find(x=>x.id===fid);
+  if(!f) return;
+  f.status='done';
+  f.doneDate = todayStr();
+  saveData();
+  render();
+  showToast('Marked as done');
+}
+function rescheduleFU(fid){
+  const f = DB.followups.find(x=>x.id===fid);
+  if(!f) return;
+  openModal(`
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <h2>Reschedule</h2>
+    <label>New appointment date</label>
+    <input type="date" id="rescheduleDate" value="${f.dueDate}">
+    <button class="btn block" onclick="saveReschedule('${fid}')">Save</button>
+  `);
+}
+function saveReschedule(fid){
+  const f = DB.followups.find(x=>x.id===fid);
+  const val = document.getElementById('rescheduleDate').value;
+  if(!val){showToast('Please select a date'); return;}
+  f.dueDate = val;
+  saveData();
+  closeModal();
+  render();
+  showToast('Appointment rescheduled');
+}
+
+/* ================= PATIENTS LIST ================= */
+function renderPatients(){
+  let html = `
+  <div class="search-box">
+    <input type="text" id="patientSearch" placeholder="🔍 Search name / HN / clinic" oninput="filterPatients(this.value)">
+  </div>
+  <div class="card" id="patientListCard">
+    ${patientListHtml('')}
+  </div>
+  <button class="btn block" onclick="openPatientForm()">+ Add New Patient</button>
+  `;
+  return html;
+}
+function patientListHtml(query){
+  query = (query||'').trim().toLowerCase();
+  let list = DB.patients.slice().sort((a,b)=>a.name.localeCompare(b.name,'th'));
+  if(query){
+    list = list.filter(p=>
+      (p.name||'').toLowerCase().includes(query) ||
+      (p.hn||'').toLowerCase().includes(query) ||
+      casesForPatient(p.id).some(c=>(c.clinic||'').toLowerCase().includes(query))
+    );
+  }
+  if(list.length===0) return `<div class="empty">No patients found</div>`;
+  return list.map(p=>{
+    const cases = casesForPatient(p.id);
+    const clinics = [...new Set(cases.map(c=>c.clinic).filter(Boolean))];
+    const fus = DB.followups.filter(f=>cases.some(c=>c.id===f.caseId) && f.status!=='done').sort((a,b)=>a.dueDate.localeCompare(b.dueDate));
+    let nextFu = fus[0] ? `Next appt: ${fmtDateShort(fus[0].dueDate)}` : 'No pending appts';
+    return `<div class="patient-item" onclick="goToPatient('${p.id}')">
+      <div>
+        <div class="name">${escapeHtml(p.name)}${p.hn?` <span style="color:var(--muted);font-weight:400;font-size:12px;">(HN: ${escapeHtml(p.hn)})</span>`:''}</div>
+        <div class="meta">${escapeHtml(clinics.join(', '))||'-'} · ${cases.length} cases · ${nextFu}</div>
+      </div>
+      <span style="color:var(--muted);">›</span>
+    </div>`;
+  }).join('');
+}
+function filterPatients(q){
+  document.getElementById('patientListCard').innerHTML = patientListHtml(q);
+}
+
+/* ================= PATIENT DETAIL ================= */
+function renderPatientDetail(pid){
+  const p = getPatient(pid);
+  if(!p) return `<div class="empty">Patient not found</div><button class="btn block" onclick="setView('patients')">Back</button>`;
+  const cases = casesForPatient(pid);
+
+  let html = `
+  <button class="link-btn" onclick="setView('patients')">‹ Back to Patients</button>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div>
+        <h3 style="margin:0;">${escapeHtml(p.name)}</h3>
+        <div class="meta" style="color:var(--muted);font-size:13px;margin-top:2px;">
+          ${p.hn?`HN: ${escapeHtml(p.hn)} · `:''}${p.phone?`Tel: ${escapeHtml(p.phone)}`:''}
+        </div>
+      </div>
+      <button class="btn small secondary" onclick="openPatientForm('${p.id}')">Edit</button>
+    </div>
+    <div class="section-title">Medical History</div>
+    <div class="history-text">${p.history ? escapeHtml(p.history) : '<span style="color:var(--muted);">No records yet</span>'}</div>
+    <button class="btn small secondary" style="margin-top:8px;" onclick="openHistoryForm('${p.id}')">Edit History</button>
+  </div>
+
+  <div class="section-title">Implant Cases (${cases.length})</div>`;
+
+  if(cases.length===0){
+    html += `<div class="card"><div class="empty">No implant cases yet</div></div>`;
+  }else{
+    cases.forEach(c=>{
+      const fus = followupsForCase(c.id);
+      const implants = (c.implants && c.implants.length) ? c.implants : [{}];
+      const teethLabel = implants.map(i=>escapeHtml(i.tooth||'-')).join(', ');
+      html += `<div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div>
+            <h4 style="margin:0;font-size:14px;">🦷 Position ${teethLabel} · ${escapeHtml(c.clinic||'-')}</h4>
+            ${c.notes?`<div class="spec" style="margin-top:4px;">Notes: ${escapeHtml(c.notes)}</div>`:''}
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <button class="btn small secondary" onclick="openCaseForm('${c.id}')">Edit</button>
+            <button class="btn small danger" onclick="deleteCase('${c.id}')">Delete</button>
+          </div>
+        </div>
+        ${implants.map((i,idx)=>{
+          const boneMem = [
+            i.boneGraft?`Bone graft: ${escapeHtml(i.boneGraft)}`:'',
+            i.membrane?`Membrane: ${escapeHtml(i.membrane)}`:''
+          ].filter(Boolean).join(' | ');
+          const stages = [
+            i.surgeryDate?`Placement: ${fmtDateShort(i.surgeryDate)}`:(i.plannedImplantDate?`Planned: ${fmtDateShort(i.plannedImplantDate)}`:'⏳ Awaiting placement'),
+            i.stage2Date?`Stage II: ${fmtDateShort(i.stage2Date)}`:'',
+            i.impressionDate?`Impression: ${fmtDateShort(i.impressionDate)}`:'',
+            i.finalDate?`Final restoration: ${fmtDateShort(i.finalDate)}`:''
+          ].filter(Boolean).join(' | ');
+          const restoration = [
+            i.labName?`Lab: ${escapeHtml(i.labName)}`:'',
+            i.abutmentType?`Abutment type: ${escapeHtml(i.abutmentType)}`:'',
+            i.crownMaterial?`Crown material: ${escapeHtml(i.crownMaterial)}`:'',
+            i.labFee?`Lab fee: ${Number(i.labFee).toLocaleString('th-TH')} THB`:''
+          ].filter(Boolean).join(' | ');
+          const preStage = [
+            i.extractionDate?`Extraction: ${fmtDateShort(i.extractionDate)}`:'',
+            i.socketPreservation?`Socket preservation: ${escapeHtml(i.socketPreservation)}`:'',
+            i.extractionNotes?`Notes: ${escapeHtml(i.extractionNotes)}`:'',
+            i.healingNotes?`Healing: ${escapeHtml(i.healingNotes)}`:'',
+            i.plannedImplantDate?`Planned implant: ${fmtDateShort(i.plannedImplantDate)}`:''
+          ].filter(Boolean).join(' · ');
+          return `<div class="spec" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
+            <b>Tooth ${escapeHtml(i.tooth||'-')}</b><br>
+            ${preStage?`<span style="background:#FFF3E8;border:1px solid #F09A2E;border-radius:8px;padding:2px 6px;font-size:11px;color:#C07800;display:inline-block;margin-bottom:4px;">🦷 Pre-stage: ${preStage}</span><br>`:''}
+            ${stages}<br>
+            ${i.brand||i.diameter||i.length?`Brand: ${escapeHtml(i.brand||'-')} | Size: ${escapeHtml(i.diameter||'-')}×${escapeHtml(i.length||'-')} mm${i.coverType?` | Closed with: ${escapeHtml(i.coverType)}`:''}`:i.coverType?`Closed with: ${escapeHtml(i.coverType)}`:''}
+            ${boneMem?`<br>${boneMem}`:''}
+            ${restoration?`<br>${restoration}`:''}
+          </div>
+          ${renderImplantXRaySection(c.id, idx, i)}`;
+        }).join('')}
+        <hr>
+        <div class="section-title" style="margin-top:0;">Follow-up Appointments</div>
+        ${fus.length===0?'<div class="empty" style="padding:10px;">No appointments</div>':fus.map(f=>{
+          const d = daysDiff(f.dueDate);
+          let badgeClass='later', badgeText=`in ${d} days`;
+          if(f.status==='done'){badgeClass='done'; badgeText='Done';}
+          else if(d<0){badgeClass='overdue'; badgeText=`${-d} days overdue`;}
+          else if(d===0){badgeClass='today'; badgeText='Today';}
+          else if(d<=7){badgeClass='week'; badgeText=`in ${d} days`;}
+          const typeLabel = escapeHtml(f.type==='Other' && f.customType ? f.customType : f.type);
+          return `<div class="fu-item">
+            <div class="fu-info">
+              <div class="name" style="font-size:13px;">${typeLabel}</div>
+              <div class="meta">📅 ${fmtDateShort(f.dueDate)} <span class="badge ${badgeClass}" style="margin-left:6px;">${badgeText}</span>${f.note?`<br>📝 ${escapeHtml(f.note)}`:''}</div>
+            </div>
+            <div class="fu-actions">
+              ${f.status!=='done'?`<button class="btn small" onclick="markDone('${f.id}')">Done</button>`:''}
+              <button class="btn small danger" onclick="deleteFU('${f.id}')">Delete</button>
+            </div>
+          </div>`;
+        }).join('')}
+        <button class="btn small secondary block" onclick="openFollowupForm('${c.id}')">+ Add Appointment</button>
+      </div>`;
+    });
+  }
+  html += `<button class="btn block" onclick="openCaseForm(null,'${pid}')">+ Add New Implant Case</button>`;
+  return html;
+}
+function escapeHtml(s){
+  return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function deleteCase(cid){
+  if(!confirm('Delete this case and all related appointments?')) return;
+  DB.cases = DB.cases.filter(c=>c.id!==cid);
+  DB.followups = DB.followups.filter(f=>f.caseId!==cid);
+  saveData();
+  render();
+  showToast('Case deleted');
+}
+function deleteFU(fid){
+  if(!confirm('Delete this appointment?')) return;
+  DB.followups = DB.followups.filter(f=>f.id!==fid);
+  saveData();
+  render();
+  showToast('Appointment deleted');
+}
+
+/* ================= STATS ================= */
+function countBy(arr, key){
+  const m = {};
+  arr.forEach(v=>{
+    const k = (v[key]||'').trim();
+    if(!k) return;
+    m[k]=(m[k]||0)+1;
+  });
+  return Object.entries(m).sort((a,b)=>b[1]-a[1]);
+}
+function renderStats(){
+  const clinicOptions = DB.clinics.map(cl=>`<option value="${escapeHtml(cl)}">${escapeHtml(cl)}</option>`).join('');
+  return `
+  <div class="card">
+    <label>Select Clinic</label>
+    <select id="statsClinicFilter" onchange="document.getElementById('statsBody').innerHTML=statsBodyHtml(this.value)">
+      <option value="">All</option>
+      ${clinicOptions}
+    </select>
+  </div>
+  <div id="statsBody">${statsBodyHtml('')}</div>
+  `;
+}
+function statsBodyHtml(clinic){
+  const filteredCases = clinic ? DB.cases.filter(c=>c.clinic===clinic) : DB.cases.slice();
+  const patientIds = new Set(filteredCases.map(c=>c.patientId));
+  const allImplants = [];
+  filteredCases.forEach(c=>(c.implants||[]).forEach(im=>allImplants.push(im)));
+  const caseIds = new Set(filteredCases.map(c=>c.id));
+  const fus = DB.followups.filter(f=>caseIds.has(f.caseId));
+  const pendingFu = fus.filter(f=>f.status!=='done').length;
+  const doneFu = fus.filter(f=>f.status==='done').length;
+
+  const byBrand = countBy(allImplants,'brand');
+  const byCoverType = countBy(allImplants,'coverType');
+  const byBone = countBy(allImplants,'boneGraft');
+  const byMembrane = countBy(allImplants,'membrane');
+  const byCrownMaterial = countBy(allImplants,'crownMaterial');
+  const byAbutmentType = countBy(allImplants,'abutmentType');
+  const byLab = countBy(allImplants,'labName');
+
+  const completedFinal = allImplants.filter(im=>im.finalDate).length;
+  const pendingFinal = allImplants.length - completedFinal;
+  const totalLabFee = allImplants.reduce((sum,im)=>sum+(Number(im.labFee)||0),0);
+
+  const listHtml = (arr, emptyText)=> arr.length===0 ? `<div class="empty" style="padding:8px;">${emptyText}</div>` :
+    arr.map(([k,v])=>`<div class="fu-item" style="padding:6px 0;">
+      <div class="fu-info"><div class="name" style="font-size:13px;">${escapeHtml(k)}</div></div>
+      <span class="badge week">${v}</span>
+    </div>`).join('');
+
+  return `
+  <div class="summary-row">
+    <div class="summary-box"><div class="num">${patientIds.size}</div><div class="lbl">Patients</div></div>
+    <div class="summary-box"><div class="num">${filteredCases.length}</div><div class="lbl">Cases</div></div>
+    <div class="summary-box"><div class="num">${allImplants.length}</div><div class="lbl">Implants placed</div></div>
+  </div>
+  <div class="summary-row">
+    <div class="summary-box overdue"><div class="num">${pendingFu}</div><div class="lbl">Pending appts</div></div>
+    <div class="summary-box week"><div class="num">${doneFu}</div><div class="lbl">Completed appts</div></div>
+  </div>
+  <div class="summary-row">
+    <div class="summary-box week"><div class="num">${completedFinal}</div><div class="lbl">Restored</div></div>
+    <div class="summary-box overdue"><div class="num">${pendingFinal}</div><div class="lbl">Pending restoration</div></div>
+    <div class="summary-box"><div class="num">${totalLabFee.toLocaleString('th-TH')}</div><div class="lbl">Total lab fee (THB)</div></div>
+  </div>
+  <div class="card"><h3>${ico('tag',18)} Implant Brand</h3>${listHtml(byBrand,'No data')}</div>
+  <div class="card"><h3>${ico('closure',18)} Closure (Cover Screw/Healing Cap)</h3>${listHtml(byCoverType,'No data')}</div>
+  <div class="card"><h3>${ico('bone',18)} Bone Graft</h3>${listHtml(byBone,'No data')}</div>
+  <div class="card"><h3>${ico('membrane',18)} Membrane</h3>${listHtml(byMembrane,'No data')}</div>
+  <div class="card"><h3>${ico('crown',18)} Crown Material</h3>${listHtml(byCrownMaterial,'No data')}</div>
+  <div class="card"><h3>${ico('screw',18)} Abutment Type</h3>${listHtml(byAbutmentType,'No data')}</div>
+  <div class="card"><h3>${ico('lab',18)} Dental Lab</h3>${listHtml(byLab,'No data')}</div>
+  `;
+}
+
+/* ================= PATIENT FORM ================= */
+function openPatientForm(pid){
+  const p = pid ? getPatient(pid) : null;
+  const clinicOptions = DB.clinics.map(cl=>`<option value="${escapeHtml(cl)}">`).join('');
+  openModal(`
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <h2>${p?'Edit Patient':'Add New Patient'}</h2>
+    <label>Patient Name *</label>
+    <input type="text" id="pf_name" value="${p?escapeHtml(p.name):''}" placeholder="Full name">
+    <div class="row2">
+      <div><label>HN / Patient ID</label><input type="text" id="pf_hn" value="${p?escapeHtml(p.hn||''):''}"></div>
+      <div><label>Phone</label><input type="text" id="pf_phone" value="${p?escapeHtml(p.phone||''):''}"></div>
+    </div>
+    <label>Clinic</label>
+    <input type="text" id="pf_clinic" list="pfClinicList" value="${p?escapeHtml(p.clinic||''):''}" placeholder="Patient's primary clinic">
+    <datalist id="pfClinicList">${clinicOptions}</datalist>
+    <label>Medical History (conditions, medications, precautions)</label>
+    <textarea id="pf_history" rows="3">${p?escapeHtml(p.history||''):''}</textarea>
+    <button class="btn block" onclick="savePatient('${p?p.id:''}')">Save</button>
+    ${p?`<button class="btn danger block" onclick="deletePatient('${p.id}')">Delete Patient</button>`:''}
+  `);
+}
+function savePatient(pid){
+  const name = document.getElementById('pf_name').value.trim();
+  if(!name){ showToast('Please enter patient name'); return; }
+  const hn = document.getElementById('pf_hn').value.trim();
+  const phone = document.getElementById('pf_phone').value.trim();
+  const clinic = document.getElementById('pf_clinic').value.trim();
+  const history = document.getElementById('pf_history').value.trim();
+  if(clinic && !DB.clinics.includes(clinic)) DB.clinics.push(clinic);
+  if(pid){
+    const p = getPatient(pid);
+    p.name=name; p.hn=hn; p.phone=phone; p.clinic=clinic; p.history=history;
+  }else{
+    const id = uid();
+    DB.patients.push({id, name, hn, phone, clinic, history, createdAt:todayStr(), xrays:[]});
+    pid = id;
+  }
+  saveData();
+  closeModal();
+  if(currentView==='patientDetail') render();
+  else setView('patientDetail', pid);
+  showToast('Patient saved');
+}
+function deletePatient(pid){
+  if(!confirm('Delete this patient with all cases and appointments? This cannot be undone.')) return;
+  const caseIds = casesForPatient(pid).map(c=>c.id);
+  DB.followups = DB.followups.filter(f=>!caseIds.includes(f.caseId));
+  DB.cases = DB.cases.filter(c=>c.patientId!==pid);
+  DB.patients = DB.patients.filter(p=>p.id!==pid);
+  saveData();
+  closeModal();
+  setView('patients');
+  showToast('Patient deleted');
+}
+function openHistoryForm(pid){
+  const p = getPatient(pid);
+  openModal(`
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <h2>Medical History - ${p.name}</h2>
+    <textarea id="hf_text" rows="6">${escapeHtml(p.history||'')}</textarea>
+    <button class="btn block" onclick="saveHistory('${pid}')">Save</button>
+  `);
+}
+function saveHistory(pid){
+  const p = getPatient(pid);
+  p.history = document.getElementById('hf_text').value.trim();
+  saveData();
+  closeModal();
+  render();
+  showToast('History saved');
+}
+
+/* ================= XRAY ================= */
+const xrayBlobCache = {}; // legacy fileId -> objectURL
+
+// Compress image to base64 (max 1200px wide, JPEG 75%)
+function compressImageToDataUrl(file, maxWidth=1200, quality=0.75){
+  return new Promise((resolve, reject)=>{
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = ()=>{
+      URL.revokeObjectURL(url);
+      let w = img.naturalWidth, h = img.naturalHeight;
+      if(w > maxWidth){ h = Math.round(h * maxWidth / w); w = maxWidth; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+
+function renderImplantXRaySection(cid, implantIdx, im){
+  const xrays = im.xrays || [];
+  const key = `${cid}_${implantIdx}`;
+  const needsBackup = xrays.some(x=>x.dataUrl && !x.driveFileId);
+  return `<div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);">
+    <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.6px;">🩻 X-ray / Images
+      ${needsBackup ? `<span style="color:var(--warn);font-weight:400;margin-left:6px;">· not backed up yet</span>` : ''}
+    </div>
+    <div class="xray-grid" id="xrayGrid_${key}">
+      ${xrays.map(x=>xrayThumbHtml(cid, implantIdx, x)).join('')}
+      <div class="xray-upload-btn" onclick="triggerImplantXRayUpload('${key}')">
+        ${ico('upload',20)}Add
+      </div>
+    </div>
+    <input type="file" id="xrayInput_${key}" accept="image/*" multiple style="display:none"
+      onchange="handleImplantXRayFiles('${cid}',${implantIdx},this.files)">
+  </div>`;
+}
+
+function xrayThumbHtml(cid, implantIdx, x){
+  const key = `${cid}_${implantIdx}`;
+  // Local dataUrl available — show directly
+  if(x.dataUrl){
+    const backed = x.driveFileId ? `<div style="position:absolute;bottom:2px;left:2px;font-size:9px;background:rgba(0,0,0,.5);color:white;border-radius:4px;padding:1px 3px;">☁</div>` : '';
+    return `<div class="xray-thumb" id="xthumb_${x.id}" style="position:relative;">
+      <img src="${x.dataUrl}" onclick="openXRayViewerLocal('${x.id}','${cid}',${implantIdx},'${escapeHtml(x.fileName)}')">
+      ${backed}
+      <button class="xray-del" onclick="event.stopPropagation();deleteImplantXRay('${cid}',${implantIdx},'${x.id}')">×</button>
+    </div>`;
+  }
+  // Restored from Drive (driveFileId exists, no local dataUrl) — load on tap
+  if(x.driveFileId){
+    const cached = xrayBlobCache[x.driveFileId];
+    return `<div class="xray-thumb" id="xthumb_${x.id}" style="position:relative;">
+      ${cached
+        ? `<img src="${cached}" onclick="openXRayViewerCached('${x.driveFileId}','${escapeHtml(x.fileName)}')">`
+        : `<div class="xray-loading" onclick="loadXRayFromDrive('${cid}',${implantIdx},'${x.id}','${x.driveFileId}')">${gAccessToken?'☁':'🔒'}</div>`
+      }
+      <button class="xray-del" onclick="event.stopPropagation();deleteImplantXRay('${cid}',${implantIdx},'${x.id}')">×</button>
+    </div>`;
+  }
+  // Legacy format: fileId only
+  const cached = xrayBlobCache[x.fileId];
+  return `<div class="xray-thumb" id="xthumb_${x.id}">
+    ${cached
+      ? `<img src="${cached}" onclick="openXRayViewer('${key}','${x.fileId}','${escapeHtml(x.fileName)}')">`
+      : `<div class="xray-loading" onclick="loadImplantXRayThumb('${cid}',${implantIdx},'${x.id}','${x.fileId}')">${gAccessToken?'⏳':'🔒'}</div>`
+    }
+    <button class="xray-del" onclick="event.stopPropagation();deleteImplantXRay('${cid}',${implantIdx},'${x.id}','${x.fileId}')">×</button>
+  </div>`;
+}
+
+function triggerImplantXRayUpload(key){
+  document.getElementById('xrayInput_'+key).click();
+}
+
+async function handleImplantXRayFiles(cid, implantIdx, files){
+  if(!files || files.length===0) return;
+  const c = getCase(cid);
+  if(!c) return;
+  const im = (c.implants||[])[implantIdx];
+  if(!im) return;
+  if(!im.xrays) im.xrays=[];
+  showToast('Saving images...');
+  try{
+    for(const file of Array.from(files)){
+      const dataUrl = await compressImageToDataUrl(file);
+      im.xrays.push({id:uid(), dataUrl, fileName:file.name, uploadedAt:todayStr()});
+    }
+    saveData();
+    render();
+    showToast(`${files.length} image(s) saved locally`);
+  }catch(e){
+    showToast('Error: '+e.message);
+  }
+}
+
+function openXRayViewerLocal(xid, cid, implantIdx, fileName){
+  const c = getCase(cid);
+  if(!c) return;
+  const im = (c.implants||[])[implantIdx];
+  const x = im && (im.xrays||[]).find(xr=>xr.id===xid);
+  if(!x || !x.dataUrl){ showToast('Image not found'); return; }
+  openModal(`
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <h2>${ico('xray',20)} ${escapeHtml(fileName||'X-ray')}</h2>
+    <img src="${x.dataUrl}" style="width:100%;border-radius:12px;margin-top:8px;">
+    <a href="${x.dataUrl}" download="${escapeHtml(fileName||'xray.jpg')}" class="btn block" style="display:block;text-align:center;text-decoration:none;margin-top:12px;">⬇ Download</a>
+  `);
+}
+
+async function loadXRayFromDrive(cid, implantIdx, xid, driveFileId){
+  if(!gAccessToken){ showToast('Please sign in to Google first'); return; }
+  const el = document.getElementById('xthumb_'+xid);
+  if(el){ const ld = el.querySelector('.xray-loading'); if(ld) ld.textContent='⏳'; }
+  try{
+    const resp = await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`,{
+      headers:{Authorization:'Bearer '+gAccessToken}
+    });
+    if(resp.status === 401){
+      showToast('Session expired — please sign in again');
+      if(el){ const ld = el.querySelector('.xray-loading'); if(ld) ld.textContent='☁'; }
+      return;
+    }
+    if(resp.status === 403){
+      showToast('Permission denied — try signing out and in again');
+      if(el){ const ld = el.querySelector('.xray-loading'); if(ld) ld.textContent='🔒'; }
+      return;
+    }
+    if(resp.status === 404){
+      showToast('Image not found on Drive (may have been deleted)');
+      if(el){ const ld = el.querySelector('.xray-loading'); if(ld) ld.textContent='❌'; }
+      return;
+    }
+    if(!resp.ok) throw new Error('HTTP '+resp.status);
+    const blob = await resp.blob();
+    const url = URL.createObjectURL(blob);
+    xrayBlobCache[driveFileId] = url;
+    if(el){
+      el.innerHTML = `<img src="${url}" onclick="openXRayViewerCached('${driveFileId}','')">
+        <button class="xray-del" onclick="event.stopPropagation();deleteImplantXRay('${cid}',${implantIdx},'${xid}')">×</button>`;
+    }
+  }catch(e){
+    showToast('Load failed: '+e.message);
+    if(el){ const ld = el.querySelector('.xray-loading'); if(ld) ld.textContent='❌'; }
+  }
+}
+
+function openXRayViewerCached(driveFileId, fileName){
+  const src = xrayBlobCache[driveFileId];
+  if(!src){ showToast('Tap image to load first'); return; }
+  openModal(`
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <h2>${ico('xray',20)} ${escapeHtml(fileName||'X-ray')}</h2>
+    <img src="${src}" style="width:100%;border-radius:12px;margin-top:8px;">
+    <a href="${src}" download="${escapeHtml(fileName||'xray.jpg')}" class="btn block" style="display:block;text-align:center;text-decoration:none;margin-top:12px;">⬇ Download</a>
+  `);
+}
+
+async function getOrCreateXRayFolder(){
+  if(gXRayFolderId) return gXRayFolderId;
+  // search for existing folder
+  const resp = await fetch(
+    `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(`name='${XRAY_FOLDER_NAME}' and mimeType='application/vnd.google-apps.folder' and trashed=false`)}&fields=files(id,name)`,
+    {headers:{Authorization:'Bearer '+gAccessToken}}
+  );
+  const data = await resp.json();
+  if(data.files && data.files.length>0){
+    gXRayFolderId = data.files[0].id;
+    return gXRayFolderId;
+  }
+  // create folder
+  const cr = await fetch('https://www.googleapis.com/drive/v3/files', {
+    method:'POST',
+    headers:{Authorization:'Bearer '+gAccessToken, 'Content-Type':'application/json'},
+    body: JSON.stringify({name:XRAY_FOLDER_NAME, mimeType:'application/vnd.google-apps.folder'})
+  });
+  const folder = await cr.json();
+  gXRayFolderId = folder.id;
+  return gXRayFolderId;
+}
+
+async function driveUploadXRay(file, folderId){
+  const boundary = 'xray'+Date.now();
+  const metadata = {name:file.name, mimeType:file.type||'image/jpeg', parents:[folderId]};
+  const fileData = await new Promise((res,rej)=>{
+    const r = new FileReader();
+    r.onload=e=>res(e.target.result);
+    r.onerror=rej;
+    r.readAsArrayBuffer(file);
+  });
+  // multipart upload
+  const metaBytes = new TextEncoder().encode(
+    `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(metadata)}\r\n--${boundary}\r\nContent-Type: ${file.type||'image/jpeg'}\r\n\r\n`
+  );
+  const endBytes = new TextEncoder().encode(`\r\n--${boundary}--`);
+  const body = new Uint8Array(metaBytes.byteLength + fileData.byteLength + endBytes.byteLength);
+  body.set(metaBytes, 0);
+  body.set(new Uint8Array(fileData), metaBytes.byteLength);
+  body.set(endBytes, metaBytes.byteLength + fileData.byteLength);
+
+  const resp = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id', {
+    method:'POST',
+    headers:{Authorization:'Bearer '+gAccessToken, 'Content-Type':`multipart/related; boundary=${boundary}`},
+    body
+  });
+  const result = await resp.json();
+  if(!result.id) throw new Error(result.error?.message||'no id returned');
+  return result.id;
+}
+
+async function loadImplantXRayThumb(cid, implantIdx, xid, fileId){
+  if(!gAccessToken){ showToast('Please sign in to Google first'); return; }
+  const el = document.getElementById('xthumb_'+xid);
+  if(el) el.querySelector('.xray-loading').textContent='⏳';
+  try{
+    const resp = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
+      headers:{Authorization:'Bearer '+gAccessToken}
+    });
+    if(!resp.ok) throw new Error('fetch failed');
+    const blob = await resp.blob();
+    const url = URL.createObjectURL(blob);
+    xrayBlobCache[fileId] = url;
+    const key = `${cid}_${implantIdx}`;
+    if(el){
+      el.innerHTML = `<img src="${url}" onclick="openXRayViewer('${key}','${fileId}','')">
+        <button class="xray-del" onclick="event.stopPropagation();deleteImplantXRay('${cid}',${implantIdx},'${xid}','${fileId}')">×</button>`;
+    }
+  }catch(e){
+    if(el) el.querySelector('.xray-loading').textContent='❌';
+  }
+}
+
+function openXRayViewer(key, fileId, fileName){
+  const src = xrayBlobCache[fileId];
+  if(!src){ showToast('Tap ⏳ to load image first'); return; }
+  openModal(`
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <h2>${ico('xray',20)} ${escapeHtml(fileName||'X-ray')}</h2>
+    <img src="${src}" style="width:100%;border-radius:12px;margin-top:8px;">
+    <a href="${src}" download="${escapeHtml(fileName||'xray.jpg')}" class="btn block" style="display:block;text-align:center;text-decoration:none;margin-top:12px;">⬇ Download</a>
+  `);
+}
+
+async function deleteImplantXRay(cid, implantIdx, xid, legacyFileId){
+  if(!confirm('Delete this X-ray?')) return;
+  const c = getCase(cid);
+  if(!c) return;
+  const im = (c.implants||[])[implantIdx];
+  if(!im) return;
+  const x = (im.xrays||[]).find(xr=>xr.id===xid);
+  im.xrays = (im.xrays||[]).filter(xr=>xr.id!==xid);
+  saveData();
+  // Delete from Drive if backed up
+  const driveId = (x && (x.driveFileId || x.fileId)) || legacyFileId;
+  if(gAccessToken && driveId){
+    fetch(`https://www.googleapis.com/drive/v3/files/${driveId}`, {
+      method:'DELETE', headers:{Authorization:'Bearer '+gAccessToken}
+    }).catch(()=>{});
+  }
+  const bid = (x && x.fileId) || legacyFileId;
+  if(bid && xrayBlobCache[bid]){ URL.revokeObjectURL(xrayBlobCache[bid]); delete xrayBlobCache[bid]; }
+  render();
+  showToast('X-ray deleted');
+}
+
+/* ================= CASE FORM ================= */
+function implantItemHtml(item){
+  item = item || {};
+  const preOpen = !!(item.extractionDate||item.extractionNotes||item.socketPreservation||item.healingNotes||item.plannedImplantDate);
+  return `<div class="implant-item" style="border:2px solid var(--bold);border-radius:16px;padding:12px;margin-bottom:10px;position:relative;background:#FFFDF9;">
+    <button type="button" class="btn ghost" style="position:absolute;top:4px;right:4px;padding:2px 8px;color:var(--danger);" onclick="this.closest('.implant-item').remove()">Remove</button>
+    <div class="row2" style="padding-right:60px;">
+      <div><label>Tooth Position *</label><input type="text" class="ii_tooth" value="${escapeHtml(item.tooth||'')}" placeholder="e.g. 36"></div>
+      <div><label>Placement Date <span style="font-weight:400;color:var(--muted)">(optional if pre-stage)</span></label><input type="date" class="ii_surgeryDate" value="${item.surgeryDate||''}"></div>
+    </div>
+
+    <div style="margin:10px 0 4px;">
+      <button type="button" onclick="togglePreImplant(this)" class="btn ghost" style="font-size:12px;padding:4px 8px;border:1.5px solid var(--border);border-radius:999px;">
+        ${preOpen?'▲':'▼'} Pre-implant Preparation
+      </button>
+    </div>
+    <div class="pre-implant-section" style="display:${preOpen?'block':'none'};background:#FFF3E8;border:1.5px dashed #F09A2E;border-radius:12px;padding:10px;margin-bottom:8px;">
+      <div style="font-size:10px;font-weight:700;color:#C07800;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;">🦷 Pre-implant Stage (Extraction &amp; Healing)</div>
+      <div class="row2">
+        <div><label>Extraction Date</label><input type="date" class="ii_extractionDate" value="${item.extractionDate||''}"></div>
+        <div><label>Socket Preservation</label><input type="text" class="ii_socketPreservation" list="boneGraftList" value="${escapeHtml(item.socketPreservation||'')}" placeholder="e.g. Bio-Oss"></div>
+      </div>
+      <label>Extraction / Pre-implant Notes</label>
+      <input type="text" class="ii_extractionNotes" value="${escapeHtml(item.extractionNotes||'')}" placeholder="e.g. Fractured tooth, periapical lesion">
+      <div class="row2" style="margin-top:4px;">
+        <div><label>Healing Period</label><input type="text" class="ii_healingNotes" value="${escapeHtml(item.healingNotes||'')}" placeholder="e.g. Wait 3 months"></div>
+        <div><label>Planned Implant Date</label><input type="date" class="ii_plannedDate" value="${item.plannedImplantDate||''}"></div>
+      </div>
+    </div>
+
+    <label>Implant Brand / System</label>
+    <input type="text" class="ii_brand" list="brandList" value="${escapeHtml(item.brand||'')}" placeholder="e.g. Straumann BLX">
+    <div class="row2">
+      <div><label>Diameter (mm)</label><input type="number" step="0.1" class="ii_diameter" value="${item.diameter||''}" placeholder="4.1"></div>
+      <div><label>Length (mm)</label><input type="number" step="0.1" class="ii_length" value="${item.length||''}" placeholder="10"></div>
+    </div>
+    <label>Closure</label>
+    <select class="ii_coverType">
+      <option value="" ${!item.coverType?'selected':''}>- Select -</option>
+      <option value="Cover Screw" ${item.coverType==='Cover Screw'?'selected':''}>Cover Screw</option>
+      <option value="Healing Cap" ${item.coverType==='Healing Cap'?'selected':''}>Healing Cap</option>
+    </select>
+    <div class="row2">
+      <div><label>Bone Graft</label><input type="text" class="ii_bone" list="boneGraftList" value="${escapeHtml(item.boneGraft||'')}" placeholder="e.g. Bio-Oss"></div>
+      <div><label>Membrane</label><input type="text" class="ii_membrane" list="membraneList" value="${escapeHtml(item.membrane||'')}" placeholder="e.g. Bio-Gide"></div>
+    </div>
+
+    <div class="section-title" style="margin-top:10px;">Treatment Stages</div>
+    <div class="row2">
+      <div><label>Stage II Date</label><input type="date" class="ii_stage2Date" value="${item.stage2Date||''}"></div>
+      <div><label>Impression Date</label><input type="date" class="ii_impressionDate" value="${item.impressionDate||''}"></div>
+    </div>
+    <label>Final Restoration Date</label>
+    <input type="date" class="ii_finalDate" value="${item.finalDate||''}">
+
+    <div class="section-title" style="margin-top:10px;">Restoration Details</div>
+    <label>Dental Lab</label>
+    <input type="text" class="ii_labName" list="labNameList" value="${escapeHtml(item.labName||'')}" placeholder="Lab name">
+    <label>Abutment Type</label>
+    <input type="text" class="ii_abutmentType" list="abutmentTypeList" value="${escapeHtml(item.abutmentType||'')}" placeholder="e.g. Custom Abutment, Ti-base">
+    <div class="row2">
+      <div><label>Crown Material</label><input type="text" class="ii_crownMaterial" list="crownMaterialList" value="${escapeHtml(item.crownMaterial||'')}" placeholder="e.g. Zirconia, E-max"></div>
+      <div><label>Lab Fee (THB)</label><input type="number" step="0.01" class="ii_labFee" value="${item.labFee||''}" placeholder="0"></div>
+    </div>
+    <input type="hidden" class="ii_xrays" value="${escapeHtml(JSON.stringify(item.xrays||[]))}">
+  </div>`;
+}
+function togglePreImplant(btn){
+  const sec = btn.closest('.implant-item').querySelector('.pre-implant-section');
+  const open = sec.style.display==='block';
+  sec.style.display = open?'none':'block';
+  btn.innerHTML = (open?'▼':'▲') + ' Pre-implant Preparation';
+}
+function addImplantItem(){
+  const wrap = document.getElementById('implantItemsWrap');
+  const dateInputs = wrap.querySelectorAll('.ii_surgeryDate');
+  const lastDate = dateInputs.length ? dateInputs[dateInputs.length-1].value : todayStr();
+  wrap.insertAdjacentHTML('beforeend', implantItemHtml({surgeryDate: lastDate || todayStr()}));
+}
+function openCaseForm(cid, patientIdForNew){
+  const c = cid ? getCase(cid) : null;
+  const patientOptions = DB.patients.slice().sort((a,b)=>a.name.localeCompare(b.name,'th'))
+    .map(p=>`<option value="${p.id}" ${ (c?c.patientId:patientIdForNew)===p.id?'selected':''}>${escapeHtml(p.name)}${p.hn?' (HN '+escapeHtml(p.hn)+')':''}</option>`).join('');
+  const clinicOptions = DB.clinics.map(cl=>`<option value="${escapeHtml(cl)}">`).join('');
+  const implants = (c && c.implants && c.implants.length) ? c.implants : [{surgeryDate: todayStr()}];
+  let defaultClinic = '';
+  if(c) defaultClinic = c.clinic||'';
+  else if(patientIdForNew){ const pp = getPatient(patientIdForNew); defaultClinic = pp?(pp.clinic||''):''; }
+
+  openModal(`
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <h2>${c?'Edit Implant Case':'Add Implant Case'}</h2>
+    ${DB.patients.length===0?`<div class="empty" style="padding:8px 0;">No patients yet. Please add a patient first.</div>
+      <button class="btn block" onclick="openPatientForm()">+ Add New Patient</button>`:`
+    <label>Patient *</label>
+    <select id="cf_patient">${patientOptions}</select>
+
+    <label>Clinic</label>
+    <input type="text" id="cf_clinic" list="clinicList" value="${escapeHtml(defaultClinic)}" placeholder="Clinic name">
+    <datalist id="clinicList">${clinicOptions}</datalist>
+
+    <datalist id="brandList">${[...new Set([...DB.brands,...BRAND_SUGGEST])].map(b=>`<option value="${escapeHtml(b)}">`).join('')}</datalist>
+    <datalist id="boneGraftList">${BONE_GRAFT_SUGGEST.map(b=>`<option value="${b}">`).join('')}</datalist>
+    <datalist id="membraneList">${MEMBRANE_SUGGEST.map(m=>`<option value="${m}">`).join('')}</datalist>
+    <datalist id="abutmentTypeList">${ABUTMENT_TYPE_SUGGEST.map(a=>`<option value="${a}">`).join('')}</datalist>
+    <datalist id="crownMaterialList">${CROWN_MATERIAL_SUGGEST.map(c=>`<option value="${c}">`).join('')}</datalist>
+    <datalist id="labNameList">${[...new Set([...DB.labNames])].map(l=>`<option value="${escapeHtml(l)}">`).join('')}</datalist>
+
+    <div class="section-title" style="margin-top:14px;">Implant Sites (multiple teeth allowed)</div>
+    <div id="implantItemsWrap">${implants.map(implantItemHtml).join('')}</div>
+    <button type="button" class="btn secondary block" onclick="addImplantItem()">+ Add Another Tooth</button>
+
+    <label>Case Notes</label>
+    <textarea id="cf_notes" rows="2">${c?escapeHtml(c.notes||''):''}</textarea>
+
+    <button class="btn block" onclick="saveCase('${c?c.id:''}')">Save Case</button>
+    `}
+  `);
+}
+function saveCase(cid){
+  const patientId = document.getElementById('cf_patient').value;
+  const clinic = document.getElementById('cf_clinic').value.trim();
+  const notes = document.getElementById('cf_notes').value.trim();
+
+  if(!patientId){ showToast('Please select a patient'); return; }
+
+  const implants = [];
+  let missingDate = false;
+  document.querySelectorAll('#implantItemsWrap .implant-item').forEach(el=>{
+    const tooth = el.querySelector('.ii_tooth').value.trim();
+    const surgeryDate = el.querySelector('.ii_surgeryDate').value;
+    const brand = el.querySelector('.ii_brand').value.trim();
+    const diameter = el.querySelector('.ii_diameter').value;
+    const length = el.querySelector('.ii_length').value;
+    const coverType = el.querySelector('.ii_coverType').value;
+    const boneGraft = el.querySelector('.ii_bone').value.trim();
+    const membrane = el.querySelector('.ii_membrane').value.trim();
+    const stage2Date = el.querySelector('.ii_stage2Date').value;
+    const impressionDate = el.querySelector('.ii_impressionDate').value;
+    const finalDate = el.querySelector('.ii_finalDate').value;
+    const labName = el.querySelector('.ii_labName').value.trim();
+    const abutmentType = el.querySelector('.ii_abutmentType').value.trim();
+    const crownMaterial = el.querySelector('.ii_crownMaterial').value.trim();
+    const labFee = el.querySelector('.ii_labFee').value;
+    const extractionDate = el.querySelector('.ii_extractionDate').value;
+    const extractionNotes = el.querySelector('.ii_extractionNotes').value.trim();
+    const socketPreservation = el.querySelector('.ii_socketPreservation').value.trim();
+    const healingNotes = el.querySelector('.ii_healingNotes').value.trim();
+    const plannedImplantDate = el.querySelector('.ii_plannedDate').value;
+    let xrays = [];
+    try{ xrays = JSON.parse(el.querySelector('.ii_xrays').value||'[]'); }catch(e){}
+    const hasAnyData = tooth || brand || diameter || length || coverType || boneGraft || membrane || stage2Date || impressionDate || finalDate || labName || abutmentType || crownMaterial || labFee || extractionDate || extractionNotes || socketPreservation || healingNotes || plannedImplantDate;
+    if(hasAnyData){
+      // surgeryDate required only if no extraction date (i.e. not a pre-stage only record)
+      if(!surgeryDate && !extractionDate) missingDate = true;
+      implants.push({tooth, surgeryDate, brand, diameter, length, coverType, boneGraft, membrane, stage2Date, impressionDate, finalDate, labName, abutmentType, crownMaterial, labFee, extractionDate, extractionNotes, socketPreservation, healingNotes, plannedImplantDate, xrays});
+    }
+  });
+  if(implants.length===0){ showToast('Please add at least 1 implant site'); return; }
+  if(missingDate){ showToast('Please enter extraction date or placement date'); return; }
+
+  if(clinic && !DB.clinics.includes(clinic)) DB.clinics.push(clinic);
+  // auto-save new brands and lab names to DB
+  implants.forEach(im=>{
+    if(im.brand && !DB.brands.includes(im.brand)) DB.brands.push(im.brand);
+    if(im.labName && !DB.labNames.includes(im.labName)) DB.labNames.push(im.labName);
+  });
+
+  let newCaseId = cid;
+  if(cid){
+    const c = getCase(cid);
+    Object.assign(c, {patientId, clinic, notes, implants});
+  }else{
+    newCaseId = uid();
+    DB.cases.push({id:newCaseId, patientId, clinic, notes, implants, createdAt:todayStr()});
+  }
+  saveData();
+  closeModal();
+  if(!cid){
+    // suggest adding a follow-up right away
+    openFollowupForm(newCaseId, true);
+  }else{
+    setView('patientDetail', patientId);
+    showToast('Case saved');
+  }
+}
+
+/* ================= FOLLOW-UP FORM ================= */
+function openFollowupForm(caseId, isAfterCase){
+  const c = getCase(caseId);
+  const typeOptions = FU_TYPES.map(t=>`<option value="${t}">${t}</option>`).join('');
+  openModal(`
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <h2>${isAfterCase?'Add Follow-up Appointment (Optional)':'Add Follow-up Appointment'}</h2>
+    <label>Appointment Type</label>
+    <select id="fuf_type" onchange="document.getElementById('fuf_customWrap').style.display=(this.value==='Other')?'block':'none'">${typeOptions}</select>
+    <div id="fuf_customWrap" style="display:none;">
+      <label>Specify type</label>
+      <input type="text" id="fuf_custom" placeholder="Enter appointment type">
+    </div>
+
+    <label>Appointment Date</label>
+    <input type="date" id="fuf_date" value="${nextWeekdayFrom(caseSurgeryDate(c), 14)}">
+    <div class="chip-row">
+      <span class="chip" onclick="setFuDate(${c?`'${caseSurgeryDate(c)}'`:'null'},7)">+1 week</span>
+      <span class="chip" onclick="setFuDate(${c?`'${caseSurgeryDate(c)}'`:'null'},14)">+2 weeks</span>
+      <span class="chip" onclick="setFuDate(${c?`'${caseSurgeryDate(c)}'`:'null'},30)">+1 month</span>
+      <span class="chip" onclick="setFuDate(${c?`'${caseSurgeryDate(c)}'`:'null'},60)">+2 months</span>
+      <span class="chip" onclick="setFuDate(${c?`'${caseSurgeryDate(c)}'`:'null'},90)">+3 months</span>
+      <span class="chip" onclick="setFuDate(${c?`'${caseSurgeryDate(c)}'`:'null'},120)">+4 months</span>
+      <span class="chip" onclick="setFuDate(${c?`'${caseSurgeryDate(c)}'`:'null'},180)">+6 months</span>
+    </div>
+
+    <label>Notes</label>
+    <textarea id="fuf_note" rows="2"></textarea>
+
+    <button class="btn block" onclick="saveFollowup('${caseId}', ${isAfterCase?'true':'false'})">Save Appointment</button>
+    ${isAfterCase?`<button class="btn secondary block" onclick="finishCaseFlow('${caseId}')">Skip</button>`:''}
+  `);
+}
+function nextWeekdayFrom(baseIso, days){
+  const base = baseIso ? new Date(baseIso) : new Date(todayStr());
+  base.setDate(base.getDate()+days);
+  return base.getFullYear()+'-'+String(base.getMonth()+1).padStart(2,'0')+'-'+String(base.getDate()).padStart(2,'0');
+}
+function setFuDate(baseIso, days){
+  document.getElementById('fuf_date').value = nextWeekdayFrom(baseIso, days);
+}
+function saveFollowup(caseId, isAfterCase){
+  const type = document.getElementById('fuf_type').value;
+  const customType = document.getElementById('fuf_custom') ? document.getElementById('fuf_custom').value.trim() : '';
+  const dueDate = document.getElementById('fuf_date').value;
+  const note = document.getElementById('fuf_note').value.trim();
+  if(!dueDate){ showToast('Please select an appointment date'); return; }
+  DB.followups.push({id:uid(), caseId, type, customType, dueDate, note, status:'pending'});
+  saveData();
+  closeModal();
+  const c = getCase(caseId);
+  setView('patientDetail', c.patientId);
+  showToast('Appointment saved');
+}
+function finishCaseFlow(caseId){
+  const c = getCase(caseId);
+  closeModal();
+  setView('patientDetail', c.patientId);
+  showToast('Case saved');
+}
+
+/* ================= SETTINGS ================= */
+function renderSettings(){
+  return `
+  ${renderGoogleSection()}
+  <div class="card">
+    <h3>${ico('tooth',18)} Implant Brands</h3>
+    <p style="font-size:12px;color:var(--muted);margin:0 0 8px;">เพิ่มอัตโนมัติเมื่อบันทึกเคส · แก้ไขหรือลบได้ที่นี่</p>
+    <div id="brandListWrap">${renderTagList('brands','brandListWrap','newBrandName')}</div>
+    <div class="row2" style="margin-top:8px;">
+      <input type="text" id="newBrandName" placeholder="e.g. Straumann BLX">
+      <button class="btn" style="flex:0 0 auto;" onclick="addTag('brands','brandListWrap','newBrandName')">Add</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3>${ico('lab',18)} Dental Labs</h3>
+    <p style="font-size:12px;color:var(--muted);margin:0 0 8px;">เพิ่มอัตโนมัติเมื่อบันทึกเคส · แก้ไขหรือลบได้ที่นี่</p>
+    <div id="labListWrap">${renderTagList('labNames','labListWrap','newLabName')}</div>
+    <div class="row2" style="margin-top:8px;">
+      <input type="text" id="newLabName" placeholder="Lab name">
+      <button class="btn" style="flex:0 0 auto;" onclick="addTag('labNames','labListWrap','newLabName')">Add</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3>${ico('hospital',18)} Clinics</h3>
+    <p style="font-size:12px;color:var(--muted);margin:0 0 8px;">เพิ่มอัตโนมัติเมื่อบันทึกคนไข้/เคส · แก้ไขหรือลบได้ที่นี่</p>
+    <div id="clinicListWrap">${renderTagList('clinics','clinicListWrap','newClinicName')}</div>
+    <div class="row2" style="margin-top:8px;">
+      <input type="text" id="newClinicName" placeholder="Clinic name">
+      <button class="btn" style="flex:0 0 auto;" onclick="addTag('clinics','clinicListWrap','newClinicName')">Add</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3>${ico('upload',18)} Backup / Export Data</h3>
+    <p style="font-size:13px;color:var(--muted);">Export all data as an Excel (CSV) file for storage or viewing on computer.</p>
+    <button class="btn block" onclick="exportCSV()">Export as Excel (CSV)</button>
+    <p style="font-size:13px;color:var(--muted);margin-top:10px;">Backup all data (.json) to transfer to another device or restore later.</p>
+    <button class="btn secondary block" onclick="exportJSON()">Backup Data (.json)</button>
+    <label style="margin-top:10px;">Import from backup file (.json)</label>
+    <input type="file" id="importFile" accept="application/json" onchange="importJSON(this.files[0])">
+  </div>
+  <div class="card">
+    <h3>${ico('summary',18)} Summary</h3>
+    <p style="font-size:13px;">Total patients: ${DB.patients.length}<br>
+    Total implant cases: ${DB.cases.length}<br>
+    Pending appointments: ${DB.followups.filter(f=>f.status!=='done').length}</p>
+  </div>
+  <div class="card">
+    <h3>${ico('warning',18)} Delete All Data</h3>
+    <p style="font-size:13px;color:var(--muted);">Delete all local data. This cannot be undone. Back up first.</p>
+    <button class="btn danger block" onclick="clearAll()">Delete All Data</button>
+  </div>
+  `;
+}
+
+/* Generic tag list renderer for brands / labNames / clinics */
+function renderTagList(dbKey, wrapId, inputId){
+  const list = DB[dbKey] || [];
+  if(list.length===0) return `<div style="font-size:13px;color:var(--muted);padding:4px 0;">None yet</div>`;
+  return `<div class="chip-row">${list.map((v,i)=>`
+    <span style="display:inline-flex;align-items:center;gap:4px;background:#FFF8F0;border:2px solid var(--bold);border-radius:999px;padding:4px 12px;font-size:12px;font-weight:700;">
+      ${escapeHtml(v)}
+      <button onclick="removeTag('${dbKey}',${i},'${wrapId}','${inputId}')"
+        style="background:none;border:none;cursor:pointer;color:var(--danger);font-size:14px;font-weight:900;line-height:1;padding:0 0 1px 2px;">×</button>
+    </span>`).join('')}
+  </div>`;
+}
+function addTag(dbKey, wrapId, inputId){
+  const input = document.getElementById(inputId);
+  const val = input.value.trim();
+  if(!val) return;
+  if(!DB[dbKey].includes(val)) DB[dbKey].push(val);
+  input.value='';
+  saveData();
+  document.getElementById(wrapId).innerHTML = renderTagList(dbKey, wrapId, inputId);
+}
+function removeTag(dbKey, idx, wrapId, inputId){
+  DB[dbKey].splice(idx, 1);
+  saveData();
+  document.getElementById(wrapId).innerHTML = renderTagList(dbKey, wrapId, inputId);
+}
+
+/* Legacy wrappers kept for compatibility */
+function renderClinicList(){ return renderTagList('clinics','clinicListWrap','newClinicName'); }
+function addClinic(){
+  const input = document.getElementById('newClinicName');
+  const name = input.value.trim();
+  if(!name) return;
+  if(!DB.clinics.includes(name)) DB.clinics.push(name);
+  input.value=''; saveData();
+  document.getElementById('clinicListWrap').innerHTML = renderClinicList();
+}
+function removeClinic(name){
+  DB.clinics = DB.clinics.filter(c=>c!==name);
+  saveData();
+  document.getElementById('clinicListWrap').innerHTML = renderClinicList();
+}
+function clearAll(){
+  if(!confirm('Delete all data? This cannot be undone.')) return;
+  if(!confirm('Confirm again: all patients, cases, and appointments will be deleted.')) return;
+  DB = {patients:[], cases:[], followups:[], clinics:[]};
+  saveData();
+  render();
+  showToast('All data deleted');
+}
+
+/* ================= EXPORT / IMPORT ================= */
+function csvEscape(v){
+  v = (v===undefined||v===null) ? '' : String(v);
+  if(/[",\n]/.test(v)) v = '"'+v.replace(/"/g,'""')+'"';
+  return v;
+}
+function exportCSV(){
+  const rows = [['Patient Name','HN','Phone','Clinic','Tooth Position','Placement Date','Brand','Size(mm)','Closure','Bone Graft','Membrane','Stage II Date','Impression Date','Final Restoration Date','Dental Lab','Abutment Type','Crown Material','Lab Fee','Case Notes','Appointment Type','Appointment Date','Status','Appointment Notes']];
+  DB.cases.forEach(c=>{
+    const p = getPatient(c.patientId);
+    const fus = followupsForCase(c.id);
+    const implants = (c.implants && c.implants.length) ? c.implants : [{}];
+    implants.forEach(im=>{
+      const size = `${im.diameter||''}x${im.length||''}`;
+      const stageFields = [im.stage2Date?fmtDateShort(im.stage2Date):'', im.impressionDate?fmtDateShort(im.impressionDate):'', im.finalDate?fmtDateShort(im.finalDate):'', im.labName||'', im.abutmentType||'', im.crownMaterial||'', im.labFee||''];
+      if(fus.length===0){
+        rows.push([p?p.name:'', p?p.hn:'', p?p.phone:'', c.clinic, im.tooth, fmtDateShort(im.surgeryDate), im.brand, size, im.coverType||'', im.boneGraft, im.membrane, ...stageFields, c.notes, '', '', '', '']);
+      }else{
+        fus.forEach(f=>{
+          const typeLabel = f.type==='Other' && f.customType ? f.customType : f.type;
+          rows.push([p?p.name:'', p?p.hn:'', p?p.phone:'', c.clinic, im.tooth, fmtDateShort(im.surgeryDate), im.brand, size, im.coverType||'', im.boneGraft, im.membrane, ...stageFields, c.notes, typeLabel, fmtDateShort(f.dueDate), f.status==='done'?'Done':'Pending', f.note]);
+        });
+      }
+    });
+  });
+  const csv = rows.map(r=>r.map(csvEscape).join(',')).join('\r\n');
+  const blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8;'});
+  downloadBlob(blob, `implant-data-${todayStr()}.csv`);
+  showToast('File exported');
+}
+function exportJSON(){
+  const blob = new Blob([JSON.stringify(DB,null,2)], {type:'application/json'});
+  downloadBlob(blob, `implant-backup-${todayStr()}.json`);
+  showToast('Data backed up');
+}
+function downloadBlob(blob, filename){
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();}, 1000);
+}
+function importJSON(file){
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    try{
+      const data = JSON.parse(e.target.result);
+      if(!data.patients || !data.cases || !data.followups) throw new Error('invalid');
+      if(!confirm('Import will replace all current data. Confirm?')) return;
+      DB = {patients:data.patients||[], cases:data.cases||[], followups:data.followups||[], clinics:data.clinics||[]};
+      saveData();
+      render();
+      showToast('Data imported successfully');
+    }catch(err){
+      showToast('Invalid file');
+    }
+  };
+  reader.readAsText(file);
+}
+
+/* ================= GOOGLE DRIVE SYNC ================= */
+const DRIVE_FILE_NAME = 'implant-tracker-data.json';
+const DRIVE_FOLDER_NAME = 'Implant Tracker';
+const DRIVE_SCOPES = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.email';
+const XRAY_FOLDER_NAME = 'Implant Tracker X-rays';
+let gXRayFolderId = null;
+let gDataFolderId = null;
+let gTokenClient = null;
+let gAccessToken = null;
+let gUserEmail = null;
+let gDriveFileId = null;
+
+function isGoogleConfigured(){
+  return typeof GOOGLE_CLIENT_ID !== 'undefined' && !!GOOGLE_CLIENT_ID && !GOOGLE_CLIENT_ID.startsWith('YOUR_');
+}
+
+function initGoogle(){
+  if(!isGoogleConfigured()) return;
+  if(typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2){
+    setTimeout(initGoogle, 300);
+    return;
+  }
+  gTokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: GOOGLE_CLIENT_ID,
+    scope: DRIVE_SCOPES,
+    callback: (resp)=>{
+      if(resp.error){ showToast('Google sign-in failed'); return; }
+      gAccessToken = resp.access_token;
+      gDriveFileId = null;
+      fetchGoogleUserInfo();
+      if(currentView==='settings') render();
+      showToast('Signed in to Google');
+    }
+  });
+}
+
+function googleSignIn(){
+  if(!gTokenClient){ showToast('Google not ready, please try again'); return; }
+  gTokenClient.requestAccessToken();
+}
+
+function googleSignOut(){
+  if(gAccessToken && typeof google !== 'undefined' && google.accounts){
+    google.accounts.oauth2.revoke(gAccessToken, ()=>{});
+  }
+  gAccessToken = null;
+  gUserEmail = null;
+  gDriveFileId = null;
+  gXRayFolderId = null;
+  gDataFolderId = null;
+  if(currentView==='settings') render();
+  showToast('Signed out of Google');
+}
+
+function fetchGoogleUserInfo(){
+  fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+    headers:{Authorization:'Bearer '+gAccessToken}
+  }).then(r=>r.json()).then(d=>{
+    gUserEmail = d.email || null;
+    if(currentView==='settings') render();
+  }).catch(()=>{});
+}
+
+async function getOrCreateDataFolder(){
+  if(gDataFolderId) return gDataFolderId;
+  const q = encodeURIComponent(`name='${DRIVE_FOLDER_NAME}' and mimeType='application/vnd.google-apps.folder' and trashed=false`);
+  const r = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`,{
+    headers:{Authorization:'Bearer '+gAccessToken}
+  });
+  const data = await r.json();
+  if(data.files && data.files.length>0){ gDataFolderId = data.files[0].id; return gDataFolderId; }
+  const cr = await fetch('https://www.googleapis.com/drive/v3/files',{
+    method:'POST',
+    headers:{Authorization:'Bearer '+gAccessToken,'Content-Type':'application/json'},
+    body: JSON.stringify({name:DRIVE_FOLDER_NAME, mimeType:'application/vnd.google-apps.folder'})
+  });
+  const folder = await cr.json();
+  gDataFolderId = folder.id;
+  return gDataFolderId;
+}
+
+async function driveFindFile(){
+  const folderId = await getOrCreateDataFolder();
+  const q = encodeURIComponent(`name='${DRIVE_FILE_NAME}' and '${folderId}' in parents and trashed=false`);
+  const r = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name,modifiedTime)&orderBy=modifiedTime+desc`,{
+    headers:{Authorization:'Bearer '+gAccessToken}
+  });
+  if(!r.ok) throw new Error('drive list failed');
+  const data = await r.json();
+  const f = (data.files||[])[0] || null;
+  gDriveFileId = f ? f.id : null;
+  return f;
+}
+
+async function driveUpload(){
+  if(!gAccessToken){ showToast('Please sign in to Google first'); return; }
+  showToast('Backing up...');
+  try{
+    // Step 1: upload all X-ray images that aren't on Drive yet
+    const xrayCount = await backupAllXRaysToDrive();
+
+    // Step 2: build DB copy for Drive — strip dataUrls to keep file small
+    const dbCopy = JSON.parse(JSON.stringify(DB));
+    for(const c of dbCopy.cases||[]){
+      for(const im of c.implants||[]){
+        for(const x of im.xrays||[]){ delete x.dataUrl; }
+      }
+    }
+
+    // Step 3: upload JSON to Drive
+    await driveFindFile();
+    const folderId = await getOrCreateDataFolder();
+    const metadata = {name: DRIVE_FILE_NAME, mimeType: 'application/json'};
+    if(!gDriveFileId) metadata.parents = [folderId];
+    const boundary = 'implanttracker' + Date.now();
+    const body =
+      `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(metadata)}\r\n`+
+      `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(dbCopy)}\r\n`+
+      `--${boundary}--`;
+    const url = gDriveFileId
+      ? `https://www.googleapis.com/upload/drive/v3/files/${gDriveFileId}?uploadType=multipart`
+      : `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart`;
+    const r = await fetch(url, {
+      method: gDriveFileId ? 'PATCH' : 'POST',
+      headers:{ Authorization:'Bearer '+gAccessToken, 'Content-Type':`multipart/related; boundary=${boundary}` },
+      body
+    });
+    if(!r.ok) throw new Error('upload failed');
+    const data = await r.json();
+    if(data.id) gDriveFileId = data.id;
+    localStorage.setItem('lastSyncUp', new Date().toISOString());
+    showToast(xrayCount > 0 ? `Backed up ✓ (${xrayCount} X-ray image(s) uploaded)` : 'Backed up to Google Drive ✓');
+    if(currentView==='settings') render();
+  }catch(e){
+    showToast('Backup failed: '+e.message);
+  }
+}
+
+async function backupAllXRaysToDrive(){
+  let count = 0;
+  try{
+    const folderId = await getOrCreateXRayFolder();
+    for(const c of DB.cases||[]){
+      for(const im of c.implants||[]){
+        for(const x of (im.xrays||[])){
+          if(x.dataUrl && !x.driveFileId){
+            const res = await fetch(x.dataUrl);
+            const blob = await res.blob();
+            const file = new File([blob], x.fileName||'xray.jpg', {type:'image/jpeg'});
+            x.driveFileId = await driveUploadXRay(file, folderId);
+            count++;
+          }
+        }
+      }
+    }
+    if(count > 0) saveData();
+  }catch(e){ /* skip if Drive not available */ }
+  return count;
+}
+
+function driveDownload(){
+  if(!gAccessToken){ showToast('Please sign in to Google first'); return; }
+  showToast('Searching for backup in Google Drive...');
+  driveFindFile().then(f=>{
+    if(!f){ showToast('No backup found in Google Drive for this account'); return; }
+    return fetch(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`, {
+      headers:{Authorization:'Bearer '+gAccessToken}
+    }).then(r=>{
+      if(!r.ok) throw new Error('download failed');
+      return r.json();
+    }).then(data=>{
+      if(!data.patients || !data.cases || !data.followups) throw new Error('invalid');
+      if(!confirm('Restore will replace all local data with Google Drive data. Confirm?')) return;
+      DB = {
+        patients:data.patients||[], cases:data.cases||[], followups:data.followups||[],
+        clinics:data.clinics||[], brands:data.brands||[], labNames:data.labNames||[]
+      };
+      saveData();
+      localStorage.setItem('lastSyncDown', new Date().toISOString());
+      render();
+      showToast('Data restored ✓ (tap X-ray images to load from Drive)');
+    });
+  }).catch(()=>showToast('Restore failed or invalid file'));
+}
+
+function renderGoogleSection(){
+  if(!isGoogleConfigured()){
+    return `<div class="card">
+      <h3>${ico('cloud',18)} Google Drive Sync</h3>
+      <p style="font-size:13px;color:var(--muted);">Google Client ID not configured for Drive sync. Google Drive<br>
+      See setup instructions in <b>SETUP.md</b> in the app folder (one-time setup).</p>
+    </div>`;
+  }
+  if(!gAccessToken){
+    return `<div class="card">
+      <h3>${ico('cloud',18)} Google Drive Sync</h3>
+      <p style="font-size:13px;color:var(--muted);">Sign in with your Google account to backup and restore data via Google Drive.<br>
+      Your data is stored privately and separately from other users.</p>
+      <button class="btn block" onclick="googleSignIn()">Sign in with Google</button>
+    </div>`;
+  }
+  const lastUp = localStorage.getItem('lastSyncUp');
+  const lastDown = localStorage.getItem('lastSyncDown');
+  return `<div class="card">
+    <h3>${ico('cloud',18)} Google Drive</h3>
+    <p style="font-size:13px;color:var(--muted);">Signed in as: <b>${gUserEmail?escapeHtml(gUserEmail):'Loading...'}</b></p>
+    ${lastUp?`<p style="font-size:12px;color:var(--muted);margin:2px 0;">Last backup: ${new Date(lastUp).toLocaleString('th-TH')}</p>`:''}
+    ${lastDown?`<p style="font-size:12px;color:var(--muted);margin:2px 0;">Last restore: ${new Date(lastDown).toLocaleString('th-TH')}</p>`:''}
+    <button class="btn block" onclick="driveUpload()">Backup to Google Drive</button>
+    <button class="btn secondary block" onclick="driveDownload()">Restore from Google Drive</button>
+    <button class="btn ghost block" onclick="googleSignOut()">Sign out of Google</button>
+  </div>`;
+}
+
+/* ================= PWA / INIT ================= */
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('service-worker.js').catch(()=>{});
+  });
+}
+
+initGoogle();
+render();
+</script>
+</body>
+</html>
